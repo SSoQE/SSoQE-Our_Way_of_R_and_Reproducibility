@@ -8,7 +8,7 @@
 
 **Tuesday, 15 September · 09:00–10:30**
 
-[View the current slides](https://ssoqe.github.io/SSoQE-Get_to_know_our_way_of_R/) · [SSoQE website](https://ssoqe.github.io/SSoQE_website/) · [2026 programme](https://ssoqe.github.io/SSoQE_website/About/program.html)
+[View the current slides](https://ssoqe.github.io/SSoQE-Our_Way_of_R_and_Reproducibility/) · [SSoQE website](https://ssoqe.github.io/SSoQE_website/) · [2026 programme](https://ssoqe.github.io/SSoQE_website/About/program.html)
 
 
 | **📅 Course information** | **🧰 Technical** | **📌 Status** |
