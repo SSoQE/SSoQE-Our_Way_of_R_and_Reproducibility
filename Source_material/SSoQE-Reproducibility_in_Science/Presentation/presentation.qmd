@@ -1,0 +1,1004 @@
+```{r}
+#| label: setup
+#| include: false
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center",
+  out.width = "100%"
+)
+
+library(countdown)
+
+# Load required packages for QR code generation
+if (!require("qrcode")) install.packages("qrcode")
+library(qrcode)
+
+if (!require("here")) install.packages("here")
+library(here)
+here::i_am("Presentation/presentation.qmd")
+
+include_local_figure <- function(data_source) {
+  knitr::include_graphics(
+    path = here::here(
+      "Presentation/Materials",
+      data_source
+    ),
+    error = TRUE
+  )
+}
+
+source(
+  here::here("R/00_Config_file.R")
+)
+
+# Dynamic project name generation using {here}
+project_name <- 
+  basename(here::here())
+
+# Create a cleaner display name for the lecture
+display_name <- 
+  gsub("SSoQE-", "", project_name) %>%
+  gsub("_", " ", .) %>%
+  tools::toTitleCase()
+
+# Create dynamic URLs
+github_url <- 
+  paste0(
+    "https://github.com/SSoQE/",
+     project_name
+  )
+
+slides_url <- 
+  paste0(
+    "https://ssoqe.github.io/", 
+    project_name, "/"
+  )
+```
+
+# {.title}
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="80%"}
+:::
+
+::: {.column width="20%"}
+
+```{r}
+#| label: ssoqe-logo-title
+include_local_figure("Logos/SSOQE_logo3.png")
+```
+
+:::
+
+::::
+
+:::: {.r-hstack}
+::: {data-id="box1" style="background: `r ssoqe_cols['black']`; width: 135px; height: 15px; margin: 0px;"}
+:::
+
+::: {data-id="box2" style="background: `r ssoqe_cols['cambridge_blue']`; width: 405px; height: 15px; margin: 0px;"}
+:::
+
+::: {data-id="box3" style="background: `r ssoqe_cols['persian_green']`; width: 225px; height: 15px; margin: 0px;"}
+:::
+
+::: {data-id="box4" style="background: `r ssoqe_cols['satin_sheen_gold']`; width: 135px; height: 15px; margin: 0px;"}
+:::
+::::
+
+::: {.text-color-white .text-font-heading .text-size-heading2 .text-bold}
+`r display_name`
+:::
+
+:::: {.columns}
+
+::: {.column width="20%"}
+
+:::
+
+::: {.column width="80%" .text-right .text-size-body}
+[👤](https://ondrejmottl.github.io/)Ondřej Mottl
+
+[Science School of Quantitative Ecology 2025]{.text-color-black}
+
+[bit.ly/SSoQE](https://bit.ly/SSoQE){.text-color-black}
+:::
+
+::::
+
+## This presentation {.title}
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="70%"}
+::: {.r-fit-text}
+[😸 Code on GitHub](`r github_url`)
+
+[🖥️ Slides](`r slides_url`)
+
+[![](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+:::
+:::
+
+::: {.column width="30%"}
+```{r}
+#| label: qr_slides
+qr_slides <-
+  qrcode::qr_code(
+    slides_url,
+    ecl = "H"
+  )
+
+qrcode::generate_svg(
+  qrcode = qr_slides,
+  filename = here::here("Presentation/Materials/QR/qr_slides.svg"),
+  foreground = ssoqe_cols['white'],
+  background = ssoqe_cols['midnight_green']
+)
+
+include_local_figure("QR/qr_slides.svg")
+```
+:::
+
+::::
+
+# [Learning Objectives]{.bold .r-fit-text} {.title}
+
+## What we'll cover today
+
+:::: {.columns}
+
+::: {.column width="45%" .incremental}
+
+### 🎯 **Main Topics**
+
+- Reproducibility
+- Projects
+- Self-containedness
+- Data Science with R
+
+:::
+
+::: {.column width="55%" .incremental}
+
+### ✅ **By the end, you'll be able to:**
+
+- Understand the importance of reproducibility in research
+- Implement best practices for project organization
+- Create self-contained R scripts and projects
+- use {tidyverse} for data science techniques
+
+:::
+::::
+
+## Research cycle
+
+```{r}
+#| label: research cycle
+include_local_figure("Illustrations/ResearchCycle.jpg")
+```
+
+::: footer
+[This image was created by Scriberia for The Turing Way community and is used under a CC-BY licence](https://zenodo.org/doi/10.5281/zenodo.3332807)
+:::
+
+## Reproducibility crisis
+
+```{r}
+#| label: reprodicibility crisis
+include_local_figure("Screenshots/1a.png")
+```
+
+::: footer
+[Baker, Monya. "1,500 scientists lift the lid on reproducibility." Nature 533, no. 7604 (2016).](https://doi.org/10.1038/533452a)
+:::
+
+## Evolution
+
+```{r}
+#| label: evolution
+include_local_figure("Illustrations/openresearch.jpg")
+```
+
+::: footer
+[This image was created by Scriberia for The Turing Way community and is used under a CC-BY licence](https://zenodo.org/doi/10.5281/zenodo.3332807)
+:::
+
+## [Discussion]{.text-size-heading2} {.exercise .text-center}
+
+<br>
+
+:::{.r-fit-text .blockquote}
+What is Open Science to You?
+:::
+
+`r countdown(minutes = 3)`
+
+# Open Science
+
+```{r}
+#| label: open-science
+include_local_figure("Illustrations/UNESCO-Open_science-pillars-en.png")
+```
+
+::: footer
+[UNESCO (2022). Understanding open science — Factsheet — SC-PBS-STIP/2022/OST/1.](https://doi.org/10.54677/UTCD9302)
+:::
+
+## A better view
+
+```{r}
+#| label: open-science-taxonomy
+include_local_figure("Illustrations/os_taxonomy.png")
+```
+
+::: footer
+[https://www.fosteropenscience.eu/](https://www.fosteropenscience.eu/)
+:::
+
+## The Journey
+
+```{r}
+#| label: open-science-journey
+include_local_figure("Illustrations/ReproducibleJourney.jpg")
+```
+
+::: footer
+[This image was created by Scriberia for The Turing Way community and is used under a CC-BY licence](https://zenodo.org/doi/10.5281/zenodo.3332807)
+:::
+
+# [Reproducibility]{.bold .r-fit-text} {.title}
+
+## Reproducibility ?
+
+::::: {.columns}
+
+:::: {.column width="60%"}
+
+```{r}
+#| label: meme-work-on-my-machine
+knitr::include_graphics("https://media.makeameme.org/created/one-does-not-50b8331726.jpg")
+```
+
+::::
+
+:::: {.column width="40%"}
+
+<br>
+
+Uknown author
+
+::: {.blockquote .text-center}
+
+I was able to reproduce my results on [my computer/machine]{.text-highlight-persianGreen}
+
+Can I consider my work [**reproducible**]{.text-highlight-satinSheenGold}?
+
+:::
+::::
+:::::
+
+::: footer
+[makeameme.org](https://media.makeameme.org/created/one-does-not-50b8331726)
+:::
+
+## Reproducibility
+
+```{r}
+#| label: reproducibility
+include_local_figure("Illustrations/ReproducibleDefinitionGrid.jpg")
+```
+
+::: footer
+[This image was created by Scriberia for The Turing Way community and is used under a CC-BY licence](https://zenodo.org/doi/10.5281/zenodo.3332807)
+:::
+
+## Time to change
+
+```{r}
+#| label: culture-shift
+include_local_figure("Illustrations/CultureShift.jpg")
+```
+
+::: footer
+[This image was created by Scriberia for The Turing Way community and is used under a CC-BY licence](https://zenodo.org/doi/10.5281/zenodo.3332807)
+:::
+
+## It is a spectrum
+
+```{r}
+#| label: rep-spectrum
+knitr::include_graphics("https://raps-with-r.dev/images/repro_spectrum.png")
+```
+
+:::{.footer}
+[Roger D. Peng ,Reproducible Research in Computational Science.Science334,1226-1227(2011).DOI:10.1126/science.1213847](https://doi.org/10.1126/science.1213847)
+:::
+
+## [Discussion]{.text-size-heading2} {.exercise .text-center}
+
+<br>
+
+:::{.r-fit-text .blockquote}
+How reproducible is your research?
+
+What can you do to improve it?
+:::
+
+`r countdown(minutes = 5)`
+
+## It is a spectrum
+
+```{r}
+#| label: rep-spectrum-details
+knitr::include_graphics("https://www.aalto.fi/sites/g/files/flghsv161/files/styles/o_914w_ah_n_nu/public/2022-02/Glerean_continuum_best_practices1800.png")
+```
+
+::: footer
+[Getting started with reproducibility in research!](https://www.aalto.fi/en/open-science-and-research/getting-started-with-reproducibility-in-research)
+:::
+
+# [PROJECTS]{.bold .r-fit-text} {.title}
+
+## Making a paper (compendium)
+
+:::: columns
+::: {.column width="60%"}
+
+```{r}
+#| label: compendium
+include_local_figure("Illustrations/ResearchCompendium.jpg")
+```
+
+:::
+
+::: {.column width="40%" .text-center}
+
+<br>
+<br>
+
+**[Project]{.text-highlight-persianGreen}**-oriented structure
+
+Each paper is a single project
+
+:::
+::::
+
+::: footer
+[This image was created by Scriberia for The Turing Way community and is used under a CC-BY licence](https://zenodo.org/doi/10.5281/zenodo.3332807)
+:::
+
+## Project communication plan
+
+```{r}
+#| label: project-communication-projects
+knitr::include_graphics("https://plan.io/images/blog/project-communication-plan.png?1722938254")
+```
+
+::: footer
+[Plan.io](https://plan.io/blog/)
+:::
+
+## Project structure
+
+```{r}
+#| label: file-management
+include_local_figure("Illustrations/file-management-manual-with-text.jpg")
+```
+
+::: footer
+[This image was created by Scriberia for The Turing Way community and is used under a CC-BY licence](https://zenodo.org/doi/10.5281/zenodo.3332807)
+:::
+
+## Project structure {auto-animate="true"}
+
+```{r}
+#| eval: false
+#| echo: true
+# .
+# └─my_awesome_project/
+#   ├─ Data/
+#   ├─ Outputs/
+#   ├─ R/
+#   ├─ README.md
+#   ├─ LICENSE
+#   └─ [project name].Rproj
+```
+
+## Project structure {auto-animate="true"}
+
+```{r}
+#| eval: false
+#| echo: true
+# .
+# └─my_awesome_project/
+#   ├─ Data/
+#   |   ├─ Input/
+#   |   ├─ Processed/
+#   |   └─ Temp/
+#   ├─ Outputs/
+#   |   ├─ Data/
+#   |   ├─ Figures/
+#   |   └─ Tables/
+#   ├─ R/
+#   |   ├─ ___Init_project___.R
+#   |   ├─ 00_Config_file.R
+#   |   ├─ 01_Data_processing/
+#   |   ├─ 02_Main_analyses/
+#   |   ├─ 03_Supplementary_analyses/
+#   |   ├─ Functions/
+#   |       └─ example_fc.R
+#   ├─ README.md
+#   ├─ LICENSE
+#   └─ [project name].Rproj
+```
+
+## Project structure {auto-animate="true"}
+
+```{r}
+#| eval: false
+#| echo: true
+# .
+# └─my_awesome_project/
+#   ├─ Data/
+#   ├─ Outputs/
+#   ├─ R/
+#   |   ├─ ___Init_project___.R
+#   |   ├─ 00_Config_file.R
+#   |   ├─ 00_Master.R
+#   |   ├─ 01_Data_processing/
+#   |   |   ├─ 01_Prepare_pollen_data.R
+#   |   |   └─ 01_Download_terrain_data.R
+#   |   ├─ 02_Main_analyses/
+#   |   |   ├─ 01_Vegetation_history/
+#   |   |   |   ├─ 01_Estimate_dissimilarty.R
+#   |   |   |   └─ 02_Summarise_dissimilarity.R
+#   |   |   ├─ 02_Rate_of_change/
+#   |   |   |   ├─ 01_Roc_estimation.R
+#   |   |   |   ├─ 02_Roc_interpolation.R
+#   |   |   ├─ 03_Temporal_patters_of_groups/
+#   |   |   |   ├─ 01_Define_groups.R
+#   |   |   |   ├─ 02_Temporal_patterns_of_groups.R
+#   |   |   └─ 04_Visualisation/
+#   |   ├─ 03_Supplementary_analyses/
+#   |   └─ Functions/
+#   ├─ README.md
+#   ├─ LICENSE
+#   └─ [project name].Rproj
+```
+
+## [Discussion]{.text-size-heading2} {.exercise .text-center}
+
+<br>
+
+::: {.r-fit-text .blockquote}
+* What is your current project structure?
+* What benefits do you think it has?
+:::
+
+`r countdown(minutes = 3)`
+
+## RStudio Projects
+
+```{r}
+#| label: rstudio-project
+knitr::include_graphics("https://ecorepsci.github.io/reproducible-science/img/rstudio-project.jpg")
+```
+
+<br>
+[**R-studio**]{.text-highlight-persianGreen} is using [Projects]{.text-highlight-cambridgeBlue} already by default
+
+::: footer
+[Reproducible Data Science](https://ecorepsci.github.io/reproducible-science/index.html)
+:::
+
+# [Self-containedness]{.bold .r-fit-text}  {.title}
+
+## Working Directory
+
+:::: columns
+::: {.column width="50%" }
+<br>
+<br>
+
+[@JennyBryan](https://twitter.com/JennyBryan):
+
+::: {.blockquote}
+If the first line of your R script is
+
+```{r}
+#| label: jenny-quote
+#| eval: false
+#| echo: true
+#| code-line-numbers: false
+setwd("C:\Users\jenny\path\that\only\I\have")
+```
+
+I will come into your office and **SET YOUR COMPUTER ON FIRE** 🔥.
+:::
+:::
+
+::: {.column width="48%" .fragment}
+```{r}
+#| label: here-here
+include_local_figure("Packages/here_pkg.png")
+```
+
+The [{here} package](https://here.r-lib.org/) is up for rescue! 
+:::
+::::
+
+::: footer
+Artwork by [@allison_horst](https://twitter.com/allison_horst)
+:::
+
+## Self-containedness
+
+R needs to have the [environment]{.text-highlight-persianGreen} set up correctly to run the code!
+
+This includes the [packages]{.text-highlight-cambridgeBlue} used in the code.
+
+```{r}
+#| label: pkg-error
+knitr::include_graphics("https://ubco-biology.github.io/BIOL202/more/no-function1.png")
+```
+
+::: footer
+[Tutorials for BIOL202](https://ubco-biology.github.io/BIOL202/could-not-find-function.html)
+:::
+
+## Self-containedness
+
+<br>
+
+:::: columns
+::: {.column width="50%" }
+
+<br>
+<br>
+
+Will [my code]{.text-highlight-midnightGreen} run on [your]{.text-highlight-persianGreen} machine?
+
+Will [my code]{.text-highlight-midnightGreen} run [in 10 years]{.text-highlight-satinSheenGold}?
+
+:::
+
+::: {.column width="49%" .text-center}
+```{r}
+#| label: renv
+include_local_figure("Packages/renv.png")
+```
+
+The [{renv} package](https://rstudio.github.io/renv/index.html) will make sure it will! 
+
+:::
+::::
+
+::: footer
+Artwork by [@allison_horst](https://twitter.com/allison_horst)
+:::
+
+
+## [Note on practical exercises]{.text-color-midnightGreen} {.bg-white}
+
+```{r}
+#| label: practical-exercise-note
+include_local_figure("Exercise/monkey_see_monkey_do_by_adiasarahma.png")
+```
+
+::: footer
+[image by adiasarahma](https://www.deviantart.com/adiasarahma/)
+:::
+
+## [Practical Exercise]{.text-size-heading2} {.exercise .text-center}
+
+<br>
+
+::: {.r-fit-text .blockquote}
+* Install the [{renv} package](https://rstudio.github.io/renv/index.html)
+* Make a new project and initialize {renv} with `renv::init()`
+* Create a snapshot with `renv::snapshot()`
+:::
+
+`r countdown(minutes = 15)`
+
+## Self-containedness 
+
+More advanced!
+
+What if we share the [whole Operating System]{.text-highlight-satinSheenGold} as well?
+
+:::: columns
+::: {.column width="39%" }
+
+```{r}
+#| label: docker_logo
+include_local_figure("Logos/docker_logo.png")
+```
+
+:::
+
+::: {.column width="60%"}
+
+```{r}
+#| label: docker_scheme
+knitr::include_graphics("https://cdn.prod.website-files.com/6708f2aa89478bd1de283d76/6752b90317bb6c74fa862e07_Blog_R-script-in-docker_docker-run-1024x629.png")
+```
+
+:::
+::::
+
+::: footer
+Icon by [icon-icons.com](https://icon-icons.com/icon/docker-official-logo/169250); artwork by [@statworx](https://www.statworx.com/en/)
+:::
+
+# [Data Science]{.bold .r-fit-text} {.title}
+
+## Why R for Data Science?
+
+:::: columns
+
+::: {.column width="25%"}
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| label: r4ds-cycle
+knitr::include_graphics("https://r4ds.hadley.nz/diagrams/data-science/base.png")
+```
+
+:::
+
+::: {.column width="25%"}
+:::
+::::
+
+[**R**]{.text-highlight-persianGreen} is specifically designed for data science:
+
+:::: columns
+
+::: {.column width="50%" .incremental}
+
+* [**Import**]{.text-highlight-midnightGreen} data from various sources
+* [**Tidy**]{.text-highlight-midnightGreen} data into consistent structure
+* [**Transform**]{.text-highlight-midnightGreen} data for analysis
+:::
+
+::: {.column width="50%" .incremental}
+* [**Visualize**]{.text-highlight-midnightGreen} patterns and relationships
+* [**Model**]{.text-highlight-midnightGreen} to understand and predict
+* [**Communicate**]{.text-highlight-midnightGreen} results effectively
+:::
+::::
+
+::: {.fragment}
+All wrapped in [**Programming**]{.text-highlight-satinSheenGold} for reproducibility!
+:::
+
+::: footer
+[R for Data Science](https://r4ds.hadley.nz/) by Hadley Wickham, Mine Çetinkaya-Rundel, and Garrett Grolemund
+:::
+
+## R for Data Science
+
+:::: columns
+::: {.column width="50%"}
+
+```{r}
+#| label: QR r4ds
+qr_r4ds <-
+  qrcode::qr_code(
+    "https://r4ds.hadley.nz/",
+    ecl = "H"
+  )
+
+qrcode::generate_svg(
+  qrcode = qr_r4ds,
+  filename = here::here("Presentation/Materials/QR/qr_r4ds.svg"),
+  foreground = ssoqe_cols['black'],
+  background = ssoqe_cols['white']
+)
+include_local_figure("QR/qr_r4ds.svg")
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| label: r4ds-book
+knitr::include_graphics("https://r4ds.hadley.nz/cover.jpg")
+```
+
+:::
+::::
+
+::: footer
+[R for Data Science](https://r4ds.hadley.nz/) - Free online at r4ds.hadley.nz
+:::
+
+## [Discussion]{.text-size-heading2} {.exercise .text-center}
+
+<br>
+
+::: {.r-fit-text .blockquote}
+* What is your experience with [{tidyverse}](https://www.tidyverse.org/)?
+* Have you read [R5DS](https://r4ds.hadley.nz/)?
+:::
+
+`r countdown(minutes = 5)`
+
+## {tidyverse} 
+
+```{r}
+#| label: tidyverse-meme
+include_local_figure("Memes/tidyverse_meme.png")
+```
+
+::: {.fragment .text-center}
+My suggestion: *Let's embrace the [{tidyverse}](https://www.tidyverse.org/)*!
+:::
+
+::: footer
+[LinkeIn - Nicholas Bell, Ph.D.](https://www.linkedin.com/pulse/tidyverse-nicholas-bell-ph-d--zftde/)
+:::
+
+## Data wrangling
+
+```{r}
+#| label: tidyverse
+include_local_figure("Illustrations/tidy_workflow.png")
+```
+
+::: footer
+[Centre for Statistics in Ecology, the Environment and Conservation (SEEC)](https://science.uct.ac.za/seec)
+:::
+
+## Data wrangling
+
+```{r}
+#| label: code-all-meme
+knitr::include_graphics("https://guangchuangyu.github.io/blog_images/R/meme/Figs/unnamed-chunk-2-1.png")
+```
+
+::: footer
+[create meme in R](https://guangchuangyu.github.io/2017/10/create-meme-in-r/)
+:::
+
+## [Code Exercise]{.text-size-heading2} {.exercise .text-center}
+
+:::{.r-fit-text .blockquote}
+GOAL: Learn basic {tidyverse} principles and functions.
+:::
+
+<br>
+
+### Materials:
+
+::: {.blockquote}
+
+* [💽Raw R code](https://github.com/SSoQE/SSoQE-Reproducibility_in_Science/blob/main/R/Exercises/01_tidyverse.qmd)
+* [🎨rendered R code](https://github.com/SSoQE/SSoQE-Reproducibility_in_Science/blob/main/R/Exercises/01_tidyverse.html.md)
+
+:::
+
+`r countdown(minutes = 15)`
+
+## Key Takeaways 🎯
+
+### Why Tidyverse?
+
+::: {.incremental}
+
+1. **Readability**: Code reads like English, making it easier to understand and maintain
+2. **Consistency**: All functions follow the same design principles
+3. **Pipes**: Chain operations together logically
+4. **Data-first**: All functions take data as the first argument (pipe-friendly)
+5. **Tidy data**: Encourage proper data structure for analysis
+
+::: 
+
+## Immutability
+
+[Do not edit raw data!]{.bold .text-highlight-persianGreen}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+Have a record of all changes to raw data! 
+
+Best practice:
+
+* `Data/Input/Raw/`
+* Data wrangling in code
+* Save processed data (`Data/Processed/`)
+
+::: 
+
+::: {.column width="50%"}
+
+```{r}
+#| label: superman meme
+include_local_figure("Memes/superman.png")
+```
+:::
+
+::::
+
+::: {.footer}
+[data_query_memes](https://www.instagram.com/p/Cy7QiQnvHPv/)
+:::
+
+## Immutability
+
+<br>
+<br>
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+#| label: immutability visual
+include_local_figure("Illustrations/immutability.webp")
+```
+:::
+
+::: {.column width="50%" .incremental}
+
+<br>
+
+1. Do not overwrite R objects!
+   + make a new object instead
+2. Do not overwrite data columns!
+   + make a new column instead
+
+:::
+
+::::
+
+::: {.footer}
+[arcserve](https://www.arcserve.com/blog/msps-why-immutable-storage-matters-when-it-comes-your-customers-data-protection)
+:::
+
+## [Code Exercise]{.text-size-heading2} {.exercise .text-center}
+
+:::{.r-fit-text .blockquote}
+GOAL: Learn basic Immutability principles.
+:::
+
+<br>
+
+### Materials:
+
+::: {.blockquote}
+
+* [💽Raw R code](https://github.com/SSoQE/SSoQE-Reproducibility_in_Science/blob/main/R/Exercises/02_immutability.qmd)
+* [🎨rendered R code](https://github.com/SSoQE/SSoQE-Reproducibility_in_Science/blob/main/R/Exercises/02_immutability.html.md)
+
+:::
+
+`r countdown(minutes = 15)`
+
+## The Immutability Checklist
+
+:::: {.columns}
+
+::: {.column width="50%" .incremental}
+
+**✅ File Level:**
+
+- [ ] Raw data files in `Data/Input/Raw/` (never edited)
+- [ ] All transformations documented in R scripts
+- [ ] Processed data saved to `Data/Processed/`
+
+**✅ Object Level:**
+
+- [ ] Create new objects instead of overwriting
+- [ ] Preserve intermediate analysis steps
+
+::: 
+
+::: {.column width="50%" .incremental}
+
+**✅ Column Level:**
+
+- [ ] Add new columns instead of replacing existing ones
+- [ ] Keep original measurements alongside transformations
+- [ ] Use clear naming conventions (e.g., `_scaled`, `_log`, `_index`)
+
+::: 
+
+::::
+
+## Summary of Data Science
+
+:::: {.columns}
+
+::: {.column width="50%" .blockquote .fragment}
+Use {tidyverse} !
+:::
+
+::: {.column width="50%" .blockquote .fragment}
+Embrace Immutability !
+:::
+
+::::
+
+**🚀 Practical Outcomes:**
+
+::: {.incremental}
+- **Debugging**: Can isolate exactly where problems occur
+- **Peer Review**: Reviewers can trace your analytical logic step-by-step
+- **Future You**: You'll understand your analysis months later
+- **Collaboration**: Others can build on and verify your work
+- **Extensions**: Easy to modify analysis without starting over
+:::
+
+# [Outro]{.bold .r-fit-text} {.title}
+
+## SPROuT
+
+The materials used in this presentation are further expanded in a greater detail in course [Science Powered through Reproducibility, Openness, and Teamwork (SPRouT)](https://github.com/CUNI-SPRouT) taught at Charles University.
+
+```{r}
+#| label: sprot-logo
+include_local_figure("Logos/sprout_logo.png")
+```
+
+
+## About me
+
+:::: {.columns}
+
+::: {.column width="25%"}
+```{r}
+#| label: personal sticker
+include_local_figure("Author/Ondrej_Mottl-transparent-shadow.png")
+```
+
+```{r}
+#| label: linktree QR
+qr_personal_web <-
+  qrcode::qr_code(
+    "https://bit.ly/ondrej_mottl",
+    ecl = "H"
+  )
+
+qrcode::generate_svg(
+  qrcode = qr_personal_web,
+  filename = here::here("Presentation/Materials/QR/qr_personal_web.svg"),
+  foreground = ssoqe_cols['black'],
+  background = ssoqe_cols['white']
+)
+
+include_local_figure("QR/qr_personal_web.svg")
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="70%"}
+[Ondřej Mottl]{.bold .r-fit-text .text-color-black}
+Assistant Professor at [Charles University](https://cuni.cz/UK-1.html)
+
+Head of the 🧑‍💻 [Laboratory of Quantitative Ecology](https://ondrejmottl.github.io/lab/about_the_lab.html)
+
+* 📧 Ondrej.mottl(at)gmail.com
+* 🦋 [ondrejmottl.bsky.social](https://bsky.app/profile/ondrejmottl.bsky.social)
+* 🐱 [Github](https://github.com/OndrejMottl)
+* 🆔 [ORCID](https://orcid.org/0000-0002-9796-5081)
+* 🌐 [Personal webpage](https://ondrejmottl.github.io/)
+:::
+
+::::
