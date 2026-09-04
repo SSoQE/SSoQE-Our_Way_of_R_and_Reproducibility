@@ -1,123 +1,31 @@
-#----------------------------------------------------------#
-#
-#
-#                     Project name
-#
-#                     Project setup
-#
-#
-#                O. Mottl, Author name
-#                         2025
-#
-#----------------------------------------------------------#
+# One-time project setup ------------------------------------------------------
 
-# Script to prepare all components of the environment to run the Project.
-#   Needs to be run only once
-
-#----------------------------------------------------------#
-# Step 0: Install {renv} for package management -----
-#----------------------------------------------------------#
-
-if (
-  "renv" %in% utils::installed.packages()
-) {
-  library(renv)
-} else {
-  # install package
+if (!requireNamespace("renv", quietly = TRUE)) {
   utils::install.packages("renv")
-
-  # load the package
-  library(renv)
 }
 
-#----------------------------------------------------------#
-# Step 1: Activate 'renv' project -----
-#----------------------------------------------------------#
+project_root <- normalizePath(".", winslash = "/", mustWork = TRUE)
+lockfile <- file.path(project_root, "renv.lock")
 
-# NOTE: The R may ask the User to restart the session (R).
-#   After that, continue with the next step
-
-renv::activate()
-
-#----------------------------------------------------------#
-# Step 1: Install {here} for file navigation -----
-#----------------------------------------------------------#
-
-if (
-  "here" %in% utils::installed.packages()
-) {
-  library(here)
-} else {
-  # install package
-  renv::install("here")
-
-  # load the package
-  library(here)
-}
-
-#----------------------------------------------------------#
-# Step 2: Synchronize package versions with the project -----
-#----------------------------------------------------------#
-
-# If there is no lock file present make a new snapshot
-if (
-  isTRUE("renv.lock" %in% list.files(here::here()))
-) {
-  cat("The project already has a lockfile. Restoring packages", "\n")
-
+if (file.exists(lockfile)) {
+  message("Existing renv.lock found; restoring its recorded dependencies.")
+  renv::activate(project = project_root)
   renv::restore(
-    lockfile = here::here("renv.lock")
+    project = project_root,
+    lockfile = lockfile,
+    prompt = FALSE
   )
-
-  cat("Set up completed. You can continute to run the project", "\n")
-
-  cat("Do NOT run the rest of this script", "\n")
+  message("Setup complete. renv.lock was not updated.")
 } else {
-  cat("The project seems to be new (no lockfile)", "\n")
+  message("No renv.lock found; initializing a new project library.")
+  renv::init(project = project_root, bare = TRUE)
 
-  cat("Continue with this script", "\n")
+  initial_packages <- c(
+    "countdown", "fs", "ggplot2", "here", "janitor", "jsonlite",
+    "knitr", "languageserver", "purrr", "qrcode", "quarto", "renv",
+    "remotes", "rlang", "showtext", "sysfonts", "tidyverse", "usethis"
+  )
+  renv::install(initial_packages, project = project_root)
+  renv::snapshot(project = project_root, prompt = FALSE)
+  message("New project setup complete and renv.lock created.")
 }
-
-#----------------------------------------------------------#
-# Step 3: Install packages to the project -----
-#----------------------------------------------------------#
-
-# install all packages in the lst from CRAN
-sapply(
-  c(
-    "fs",
-    "here",
-    "janitor",
-    "jsonlite",
-    "knitr",
-    "languageserver",
-    "quarto",
-    "renv",
-    "remotes",
-    "rlang",
-    "tidyverse",
-    "usethis",
-    "utils"
-  ),
-  renv::install,
-  character.only = TRUE
-)
-
-# install RUtilpol from GitHub
-remotes::install_github(
-  repo = "HOPE-UIB-BIO/R-Utilpol-package",
-  ref = "HEAD",
-  quiet = FALSE,
-  upgrade = "ask"
-)
-
-#----------------------------------------------------------#
-# Step 4: Save versions of packages -----
-#----------------------------------------------------------#
-
-renv::snapshot(
-  lockfile = here::here("renv.lock")
-)
-
-cat("Set up completed. You can continute to run the project", "\n")
-

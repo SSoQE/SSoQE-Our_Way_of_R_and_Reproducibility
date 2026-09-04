@@ -19,6 +19,8 @@
 
 library(here)
 
+here::i_am("R/render.R")
+
 source(
   here::here("R/00_Config_file.R")
 )
