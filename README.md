@@ -20,24 +20,27 @@
 
 ## 🌿 About the lesson
 
-This session combines the former “Get to Know Our Way of R” and “Reproducibility in Science” modules. This repository is the base for the merged lesson; relevant material from the former reproducibility module will be consolidated here.
+This 90-minute practical is a concise “tasting menu” of the shared R practices used throughout SSoQE. Synthetic forest-plot examples connect fresh sessions, scripts, portable paths, project dependencies, and data immutability. The final challenge uses R's built-in Black Cherry tree data for a peer rerun.
 
-The session introduces the shared R practices used throughout SSoQE and connects them to reproducible project design. It is not a generic introduction to every feature of R: the focus is readable code, explicit project structure, immutable inputs, project-relative paths, transparent dependencies, and analyses that can be rerun from a clean session.
+Software installation and account setup happen **before arrival**. Participants should complete the [SSoQE pre-arrival technical setup](https://ssoqe.github.io/SSoQE_website/About/pre_workshop.html) before this lesson; class time is reserved for reproducible practice rather than installation or authentication troubleshooting.
 
 ## 🎯 Learning goals
 
 By the end of the lesson, participants should be able to:
 
 - navigate an R project and distinguish source, input, derived data, and output;
-- write readable R using descriptive names, explicit package namespaces, native `|>`, and project-relative paths;
+- write consequential code in scripts and recreate objects from declared inputs;
+- use project-relative paths with `here::here()`;
 - keep raw data immutable and avoid hidden workspace or working-directory dependence;
-- explain why scripts, Quarto documents, dependency records, and version control contribute to reproducibility;
-- recognize the difference between an explicit setup workflow and an ordinary analysis or render.
+- distinguish file-, object-, and column-level data immutability;
+- explain the roles of an `renv` project library and lockfile;
+- pass a clean-session peer rerun audit.
 
 ## 📚 Materials
 
-- `Presentation/presentation.qmd` is the current slide source and the base for the merged 2026 presentation.
-- `R/Exercises/01_example.qmd` is the current exercise template.
+- `Presentation/presentation.qmd` is the 90-minute lesson source.
+- `R/Exercises/final_boss_starter.R` is the deliberately broken script linked from the final exercise slide.
+- `Data/Input/forest_plots.csv` is the bundled immutable input.
 - `R/render.R` renders the presentation and updates the publication copy.
 - `Presentation/colors.json`, `Presentation/fonts.json`, and `Presentation/custom_theme.json` are the editable theme sources.
 

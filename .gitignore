@@ -48,3 +48,7 @@ rsconnect/
 
 # Quarto
 /.quarto/
+
+# Reproducible exercise outputs
+/Data/Derived/*
+!/Data/Derived/.gitkeep

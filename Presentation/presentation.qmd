@@ -15,9 +15,6 @@ library(countdown)
 if (!require("qrcode")) install.packages("qrcode")
 library(qrcode)
 
-if (!require("magrittr")) install.packages("magrittr")
-library(magrittr)
-
 if (!require("here")) install.packages("here")
 library(here)
 here::i_am("Presentation/presentation.qmd")
@@ -37,25 +34,25 @@ source(
 )
 
 # Dynamic project name generation using {here}
-project_name <- 
+project_name <-
   basename(here::here())
 
 # Create a cleaner display name for the lecture
-display_name <- 
-  gsub("SSoQE-", "", project_name) %>%
-  gsub("_", " ", .) %>%
+display_name <-
+  gsub("SSoQE-", "", project_name) |>
+  gsub("_", " ", x = _) |>
   tools::toTitleCase()
 
 # Create dynamic URLs
-github_url <- 
+github_url <-
   paste0(
     "https://github.com/SSoQE/",
-     project_name
+    project_name
   )
 
-slides_url <- 
+slides_url <-
   paste0(
-    "https://ssoqe.github.io/", 
+    "https://ssoqe.github.io/",
     project_name, "/"
   )
 ```
@@ -105,9 +102,9 @@ include_local_figure("Logos/SSOQE_logo3.png")
 :::
 
 ::: {.column width="80%" .text-right .text-size-body}
-[👤](https://ondrejmottl.github.io/)Ondřej Mottl
+[👤](https://ondrejmottl.github.io/) Ondřej Mottl
 
-[Science School of Quantitative Ecology 2025]{.text-color-black}
+[Science School of Quantitative Ecology 2026]{.text-color-black}
 
 [bit.ly/SSoQE](https://bit.ly/SSoQE){.text-color-black}
 :::
@@ -116,8 +113,6 @@ include_local_figure("Logos/SSOQE_logo3.png")
 
 
 ## [This presentation]{.text-bold .r-fit-text} {.title}
-
-<br>
 
 :::: {.columns}
 
@@ -143,8 +138,8 @@ qr_slides <-
 qrcode::generate_svg(
   qrcode = qr_slides,
   filename = here::here("Presentation/Materials/QR/qr_slides.svg"),
-  foreground = ssoqe_cols['white'],
-  background = ssoqe_cols['midnight_green']
+  foreground = ssoqe_cols["white"],
+  background = ssoqe_cols["midnight_green"]
 )
 
 include_local_figure("QR/qr_slides.svg")
@@ -153,987 +148,1004 @@ include_local_figure("QR/qr_slides.svg")
 
 ::::
 
-# [Learning Objectives]{.bold .r-fit-text} {.title}
+## Reproducibility? 🤔
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="60%"}
+
+![](Materials/Memes/one-does-not-simply-run-on-my-computer.jpg){fig-alt="One does not simply say it works on my machine meme" width="100%"}
+
+:::
+
+::: {.column width="40%"}
+
+<br>
+<br>
+
+::: {.blockquote .text-center}
+
+I reproduced the result on [my computer]{.text-highlight-cambridgeBlue}. Is the work [**reproducible**]{.text-highlight-persianGreen}?
+
+:::
+
+:::
+
+::::
+
+::: footer
+[Meme image from makeameme.org](https://media.makeameme.org/created/one-does-not-50b8331726)
+:::
 
 ## What we'll cover today
 
 :::: {.columns}
 
-::: {.column width="45%" .incremental}
+::: {.column width="46%" .incremental}
 
-### 🎯 **Main Topics**
+### 🎯 **Main topics**
 
-- Navigate RStudio interface
-- R code execution & understanding environments
+- Hidden session state
+- Immutable data workflows
 - R Projects
-- Verify your setup
+- Portable paths and package libraries
+- The restart-and-rerun test
+
 :::
 
-::: {.column width="55%" .incremental}
+::: {.column width="54%" .incremental}
 
 ### ✅ **By the end, you'll be able to:**
 
-- Find your way around RStudio
-- Understand R environments and memory usage
-- Use R Projects to have reproducible pathing
-- Be ready for SSoQE 2025!
-:::
-
-::::
-
-# [R]{.bold .r-fit-text} {.title}
-
-## R is ...
-
-- A programming language for [statistical]{.text-highlight-midnightGreen} computing and graphics
-- Widely used in academia and industry
-- [Open-source]{.text-highlight-persianGreen} and free to use
-- Highly extensible with packages
-- Supported by a large and [active community]{.text-highlight-satinSheenGold}
-
-## GUI {.text-center}
-
-**GUI** = [G]{.text-highlight-midnightGreen}raphical [U]{.text-highlight-midnightGreen}ser [I]{.text-highlight-midnightGreen}nterface
-
-The choice is yours!
-
-:::: {.columns}
-
-::: {.column width="40%" .text-center}
-
-<br>
-<br>
-
-```{r}
-#| label: rstudio-logo
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Logos/RStudio_logo_flat.svg.png")
-```
-
-### [RStudio](https://rstudio.com/) 
-:::
-
-::: {.column width="30%" .text-center}
-```{r}
-#| label: VSCode-logo
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Logos/VSCode_logo.svg.png")
-```
-
-### [VS Code](https://code.visualstudio.com/)
-:::
-
-::: {.column width="30%" .text-center}
-```{r}
-#| label: positron-logo
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Logos/positron_logo.png")
-```
-
-### [Positron](https://positron.posit.co/)
-:::
-
-::::
-
-## RStudio IDE
-
-```{r}
-#| label: rstudio-ide
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Printscreens/RStudio_IDE_screenshot.png")
-```
-
-::: footer
-[wiki](https://en.wikipedia.org/wiki/RStudio)
-:::
-
-## 📝 **Source Panel**
-
-<br>
-<br>
-
-:::: {.columns}
-
-::: {.column width="50%" .incremental}
-
-- Write and edit your R scripts
-- Save your code for later
-- Syntax highlighting & autocomplete
-
-:::
-
-::: {.column width="50%" }
-
-```{r}
-#| label: rstudio-ide-cut_1
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Printscreens/RStudio_IDE_screenshot-cut_1.png")
-```
+- Start fresh and recreate objects from code
+- Preserve inputs and make transformations explicit
+- Give every analysis a clear project home
+- Use `{here}` and explain `{renv}`
+- Hand the project to somebody else and rerun it
 
 :::
 
 ::::
 
-## 💻 **Console Panel** 
+## Our mini-project 🌲
 
 <br>
+
+Twelve synthetic forest plots contain:
+
+- forest type;
+- tree count 
+- mean diameter;
+- species richness;
+- canopy cover
+
+<br>
+
+::: {.fragment}
+Our goal is a small summary that another researcher can reproduce.
+:::
+
+
+## How we will repair it 🧰
+
+<br>
+
+::: {.incremental}
+
+- Define the reproducibility problem;
+- Remove hidden state;
+- Protect the evidence;
+- Give the analysis a home;
+- Make files and software portable;
+- Assemble and run the complete workflow;
+- Let somebody else prove it.
+
+:::
+
+# [REMOVE HIDDEN STATE]{.bold .r-fit-text} {.title}
+
+## A suspicious success 🤨
+
+<br>
+
+let's call
+
+```r
+forest_summary |>
+  dplyr::arrange(
+    dplyr::desc(mean_richness)
+  )
+```
+
+<br>
+
+::: {.fragment}
+It works on my laptop. Is that enough?
+:::
+
+<br>
+
+::: {.fragment .blockquote}
+Where did `forest_summary` come from?
+:::
+
+<br>
+
+## The Console 🖥️
+
+<br>
+
+The Console runs [one command at a time]{.text-highlight-cambridgeBlue}.
+
+```r
+forest_raw <- readr::read_csv(input_path)
+```
+
+::: {.fragment}
+R follows the instruction and creates an object called `forest_raw`.
+:::
+
+<br>
+
+::: {.fragment}
+```r
+nrow(forest_raw)
+```
+
+Now the next command can use that object. ✨
+:::
+
+::: {.fragment .blockquote}
+The Console is brilliant for a quick experiment—but it remembers the result only inside the current session.
+:::
+
+## Memory management 🗑️
+
 <br>
 
 :::: {.columns}
 
-::: {.column width="50%" .incremental}
+::: {.column width="52%"}
 
-- Interactive R session
-- See output and results
-- Quick calculations
+### 👀 **Environment panel**
+
+::: {.incremental}
+
+- **Objects:** what currently exists
+- **Types:** data frames, vectors, functions
+- **Size:** how much memory objects use
 
 :::
 
-::: {.column width="50%" }
+::: {.fragment}
+[It shows the current state—not how that state was created.]{.text-highlight-cambridgeBlue}
+:::
 
-```{r}
-#| label: rstudio-ide-cut_2
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Printscreens/RStudio_IDE_screenshot-cut_2.png")
+:::
+
+::: {.column width="48%"}
+
+::: {.fragment}
+### 🧹 **Remove an object**
+
+```r
+rm(forest_raw)
 ```
+:::
+
+::: {.fragment}
+- `rm()` clears an object from memory.
+:::
 
 :::
 
 ::::
 
-## 🗂️ **Environment Panel**
+## Restarting the session 🔄
+
+<br>
+
+Restarting R ends the current R process and starts a [fresh one]{.text-highlight-persianGreen}.
+
+::: {.incremental}
+
+- objects in the Global Environment disappear;
+- attached packages are detached;
+- unrecorded steps stop helping the analysis;
+- RStudio and the project remain open.
+
+:::
+
+::: {.fragment .text-center}
+### In RStudio: `Ctrl + Shift + F10` ⌨️
+:::
+
+::: {.fragment .blockquote}
+Restarting is not an emergency repair. It is a routine reproducibility test.
+:::
+
+## Which one survives a restart? 🤔
 
 <br>
 <br>
 
 :::: {.columns}
 
-::: {.column width="50%" .incremental}
+::: {.column width="48%"}
 
-- Variables in memory
-- Data objects
-- History of commands
-- Version control (git)
-
-:::
-
-::: {.column width="50%" }
-
-```{r}
-#| label: rstudio-ide-cut_3
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Printscreens/RStudio_IDE_screenshot-cut_3.png")
+```r
+mean(
+  forest_raw$species_richness,
+  na.rm = TRUE
+)
 ```
-
-:::
-
-::::
-
-## 📊 **Files/Plots Panel**
 
 <br>
 <br>
 
-:::: {.columns}
-
-::: {.column width="50%" .incremental}
-
-- File browser
-- Plot output
-- Package management
-- Help documentation
+::: {.fragment .text-center}
+❌ `forest_raw` does not exist.
+:::
 
 :::
 
-::: {.column width="50%" }
+::: {.column width="48%"}
 
-```{r}
-#| label: rstudio-ide-cut_4
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Printscreens/RStudio_IDE_screenshot-cut_4.png")
+::: {.fragment}
+```r
+forest_raw <- readr::read_csv(input_path)
+
+mean(
+  forest_raw$species_richness,
+  na.rm = TRUE
+)
 ```
+:::
+
+<br>
+
+::: {.fragment .text-center}
+✅ The object is recreated first.
+:::
 
 :::
 
 ::::
 
-## Navigation Tips
+## `.RData`: zombie memory 🧟
+
+<br>
 
 :::: {.columns}
 
-::: {.column width="65%" .incremental}
+::: {.column width="45%"}
 
-### ⌨️ **Keyboard Shortcuts**
+### 💾 **What it does**
 
-- `Ctrl + Enter`: Run current line/selection
-- `Ctrl + Shift + Enter`: Run entire script
-- `Ctrl + L`: Clear console
-- `Tab`: Autocomplete
-- `Ctrl + ↑`: Command history
-  
+::: {.incremental}
+
+- saves workspace objects at the end of a session;
+- can restore them automatically next time;
+- "resurrects" objects without the code that created them.
+
 :::
 
-::: {.column width="35%" .fragment}
+<br>
 
-### 🎨 **Customization**
+::: {.fragment .blockquote}
+**NEVER** rely on `.RData`.
+:::
 
-- Tools → Global Options
-- Appearance themes
-- Panel layout
-- Code display options
+:::
+
+::: {.column width="3%"}
+:::
+
+::: {.column width="49%"}
+
+::: {.fragment}
+### **Turn it off in RStudio** 🚫
+
+**Tools → Global Options → General**
+
+1. Uncheck **Restore .RData into workspace**.
+2. Set **Save workspace to .RData on exit** to **Never**.
+:::
+
+::: {.fragment}
+A clean session should fail loudly when the script forgot a step. 📣
+:::
 
 :::
 
 ::::
+
+## Scripts: the project's memory 🧠
+
+<br>
+
+::: {.fragment}
+Put every decision needed for the result in a script:
+
+```r
+# R/analysis.R  
+forest_raw <- 
+  readr::read_csv(
+    here::here("Data", "Input", "forest_plots.csv"),
+    show_col_types = FALSE
+  )
+
+estimate_diversity(forest_raw)
+```
+:::
+
+<br>
+
+::: {.fragment .blockquote}
+If a command matters, it belongs in the script.
+:::
 
 ## [Note on practical exercises]{.r-fit-text .text-color-dartmouth-green} {.bg-white}
 
+![](Materials/Exercise/monkey_see_monkey_do_by_adiasarahma.png){fig-alt="Monkey see, monkey do illustration signalling that students first watch a demonstration and then try it themselves" width="58%"}
+
+::: footer
+[Image by adiasarahma](https://www.deviantart.com/adiasarahma/)
+:::
+
+## [Your turn]{.text-size-heading2} {.exercise .text-center}
+
+<br>
+
+::: {.blockquote}
+
+With a partner:
+
+1. Create a new object in the Console;
+2. Chech the Environment panel;
+3. restart R session (CTRL + Shift + F10);
+4. Check the Environment panel again.
+5. (Optional) Dissable automatic saving of .RData.
+
+:::
+
+
+# [GIVE THE ANALYSIS A HOME]{.bold .r-fit-text} {.title}
+
+## Project based workflow 
+
 ```{r}
-#| label: practical-exercise-note
-include_local_figure("Exercise/monkey_see_monkey_do_by_adiasarahma.png")
+#| label: project_compendium
+include_local_figure("Scriberia/ResearchCompendium.jpg")
 ```
 
 ::: footer
-[image by adiasarahma](https://www.deviantart.com/adiasarahma/)
-:::
-
-## [Practical Exercise]{.r-fit-text} {.exercise .text-center}
-
-<br>
-
-::: {.blockquote}
-1. Use keyboard shortcuts to run code in the console
-2. Customize RStudio appearance (theme, font size)
-:::
-
-`r countdown(minutes = 5)`
-
-
-# [Execution & Environments]{.bold .r-fit-text} {.title}
-
-## Running Code
-
-:::: {.columns}
-
-::: {.column width="50%" .incremental}
-
-### 🖥️ **Console**
-
-```{r}
-#| label: console-interaction
-#| eval: true
-#| echo: true
-x <- 5
-y <- 10
-result <- x + y
-print(result)
-```
-
-- all [objects]{.text-highlight-midnightGreen} created in the console are stored in the [memory]{.text-highlight-persianGreen} (~ RAM)
-- objects are [temporary!!!]{.text-highlight-satinSheenGold} and will be lost when you close R/RStudio (restart session)
-
-:::
-
-::: {.column width="50%" .fragment .incremental}
-
-### 🗑️ **Memory Management**
-
-```{r}
-#| label: memory-management
-#| eval: false
-#| echo: true
-# Remove specific objects
-rm(data_experiment)
-```
-
-### 👀 **Environment Panel**
-
-- **Objects**: See contents of memory
-- **Types**: Data frames, vectors, functions
-- **Memory usage**: RAM consumption
-
-:::
-
-::::
-
-## Workspace vs Session
-
-:::: {.columns}
-
-::: {.column width="55%" .incremental}
-
-### 💾 **Workspace**
-
-- `.RData` can save objects from previous session
-- [Never do that!!!]{.text-highlight-satinSheenGold} 
-
-::: {.fragment }
-
-- Settings: Tools → Global Options → General
-   + [Uncheck]{.text-highlight-midnightGreen} "Restore .RData into workspace"
-   + "Save workspace to .RData on exit": ["Never"]{.text-highlight-persianGreen}
-- clean R environment often
-   + Shortcut: `Ctrl + Shift + F10`
-
-:::
-
-::::
-
-::: {.column width="45%" .incremental}
-
-### 📝 **What to save?**
-
-- Everything is temporary unless saved on disk
-- save scripts, not objects
-- save important data on drive (as CSV or RDS)
-
-### ✅ **Best Practice**
-
-- Start fresh each session
-- Write all code in scripts
-- Recreate objects from code / load data
-- Ensure reproducibility
-
-:::
-
-::::
-
-## [Practical Exercise]{.r-fit-text} {.exercise .text-center}
-
-<br>
-
-::: {.blockquote}
-1. Setup RStudio to never save or load `.RData`
-2. Clear your environment using the button or shortcut
-:::
-
-# [R Projects]{.bold .r-fit-text} {.title}
-
-## Project file structure
-
-```{r}
-#| label: file-management
-include_local_figure("Scriberia/file-management-manual-with-text.jpg")
-```
-
-::: {.footer}
 [This image was created by Scriberia for The Turing Way community and is used under a CC-BY licence](https://zenodo.org/doi/10.5281/zenodo.3332807)
 :::
+:::{.footer}
 
+:::
 
-## Project structure - RStudio Projects
-
-[**R-studio**]{.text-background-dartmouth-green} is using [Projects]{.text-background-brunswick-green} already by default
+## RStudio Projects
 
 <br>
 
-```{r}
-#| label: rstudio-project
-knitr::include_graphics("https://ecorepsci.github.io/reproducible-science/img/rstudio-project.jpg")
-```
-
-::: {.footer}
-[Reproducible Data Science](https://ecorepsci.github.io/reproducible-science/index.html)
-:::
-
-## What is an R Project?
+### 📁 **One analysis, one home**
 
 :::: {.columns}
 
-::: {.column width="50%" .incremental}
+::: {.column width="48%"}
 
-### 📁 **Self-Contained Workspace**
-
-- `.Rproj` file in root directory
-- Isolated working directory
-- Usage by other software (e.g. Git)
+![](Materials/Printscreens/RStudio_IDE_screenshot.png){fig-alt="RStudio interface showing the project-oriented working environment" width="100%"}
 
 :::
 
-::: {.column width="50%" .incremental}
+::: {.column width="48%" .incremental}
 
-### 🎯 **Benefits**
+<br>
 
-- **Isolation**: No interference between projects
-- **Organization**: Clear folder structure
-- **Reproducibility**: Relative file paths 
-- **Version Control**: Git integration
+- one project root;
+- one working directory;
+- one `.Rproj` file;
+- one isolated R session.
 
 :::
 
 ::::
 
-## [Practical Exercise]{.r-fit-text} {.exercise .text-center}
+<br>
+
+::: {.fragment}
+[The active project name appears in the top-right corner of RStudio.]{.text-highlight-persianGreen}
+:::
+
+## Project hopping 🐸 {.exercise .text-center}
 
 <br>
 
 ::: {.blockquote}
-1. Create a new (RStudio) project
-2. Switch between projects
+
+**With a partner:**
+
+1. Select **File → New Project → New Directory → New Project**.
+2. Name it `forest-sandbox` and create it somewhere you can find again.
+3. Use RStudio's top-right project menu to return to this lesson.
+4. Switch back to `forest-sandbox` with the same menu.
 :::
 
-`r countdown(minutes = 5)`
+# [PROTECT THE EVIDENCE]{.bold .r-fit-text} {.title}
 
-# [File Paths & the `{here}` Package]{.bold .r-fit-text} {.title}
+## Immutability
 
-## Working Directory
-
-:::: columns
-::: {.column width="55%" }
 <br>
+
+::: {.blockquote .fragment}
+**Never changing the original**
+:::
+
 <br>
+
+::: {.incremental}
+
+1. **File level:** never overwrite a received data file.
+2. **Object level:** create new objects instead of repeatedly overwriting one.
+3. **Column level:** add new columns instead of replacing measurements.
+
+:::
+
+## File-level immutability 📁
+
+<br>
+
+::: {.text-center}
+[Never overwrite raw data files!]{.text-highlight-satinSheenGold}
+:::
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="48%" .fragment}
+
+**❌ Hidden manual edit**
+
+```text
+Data/Input/forest_plots.csv
+  ↳ open in spreadsheet
+  ↳ replace 120 with NA
+  ↳ click Save
+```
+
+The received file is gone.
+
+:::
+
+::: {.column width="48%" .fragment}
+
+**✅ Recorded transformation**
+
+```text
+Data/Input/forest_plots.csv
+  ↳ R/analysis.R
+  ↳ Data/Derived/forest_summary.csv
+```
+
+The original and the decision both remain.
+
+:::
+
+::::
+
+## 💻 {.text-center}
+
+![](Materials/Memes/code-all-the-things.png){fig-alt="Meme showing an intensely determined person with the words Code All the Things" width="88%"}
+
+::: {.footer}
+Meme from [Guangchuang Yu via R-bloggers](https://www.r-bloggers.com/2017/10/creat-meme-in-r/)
+:::
+
+::: {.notes}
+[Sources]
+
+- Guangchuang Yu, "Create memes in R": https://www.r-bloggers.com/2017/10/creat-meme-in-r/
+- Image: https://i0.wp.com/guangchuangyu.github.io/blog_images/R/meme/Figs/unnamed-chunk-2-1.png?zoom=1.75&w=578&ssl=1
+:::
+
+## Object-level immutability 🔄
+
+<br>
+
+::: {.text-center}
+[Create new objects instead of overwriting!]{.text-highlight-satinSheenGold}
+:::
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="48%" .fragment}
+
+**❌ The history disappears**
+
+```r
+forest_data <- 
+  readr::read_csv(raw_path)
+
+forest_data <- 
+  forest_data |> 
+  dplyr::filter(
+    !is.na(species_richness)
+  )
+```
+
+:::
+
+::: {.column width="48%" .fragment}
+
+**✅ Each step has a name**
+
+```r
+forest_raw <- 
+  readr::read_csv(raw_path)
+
+forest_complete <- 
+  forest_raw |>
+  dplyr::filter(
+    !is.na(species_richness)
+  )
+```
+
+:::
+
+::::
+
+## Column-level immutability 📊  
+
+<br>
+
+::: {.text-center}
+[Add new columns—do not replace existing ones!]{.text-highlight-satinSheenGold}
+:::
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="48%" .fragment}
+
+**❌ What did this value mean?**
+
+```r
+forest_checked <- 
+  forest_raw |>
+  dplyr::select(canopy_cover) |>
+  dplyr::mutate(
+    canopy_cover = canopy_cover * 100,
+    canopy_cover = dplyr::if_else(
+      canopy_cover > 100,
+      NA_real_,
+      canopy_cover
+    )
+  )
+```
+
+:::
+
+::: {.column width="48%" .fragment}
+
+**✅ Preserve the report and add meaning**
+
+```r
+forest_checked <- 
+  forest_raw |>
+  dplyr::select(canopy_cover) |> 
+  dplyr::mutate(
+    canopy_cover_percent = canopy_cover * 100,
+    canopy_cover_valid = dplyr::if_else(
+      canopy_cover_percent > 100,
+      NA_real_,
+      canopy_cover_percent
+    )
+  )
+```
+
+:::
+
+::::
+
+## The immutability checklist ✅
+
+:::: {.columns}
+
+::: {.column width="50%" .incremental .fragment}
+
+**📁 File level**
+
+- [ ] Raw data remain in `Data/Input/`.
+- [ ] Data wrangling happens in code.
+- [ ] Derived data go to `Data/Derived/`.
+
+**🔄 Object level**
+
+- [ ] New obejct receive new names.
+- [ ] The imported object remains available.
+
+:::
+
+::: {.column width="50%" .incremental .fragment}
+
+**📊 Column level**
+
+- [ ] New columns preserve reported values.
+- [ ] Names communicate units and meaning.
+- [ ] Quality decisions remain inspectable.
+
+**🧪 Reproducibility test**
+
+- [ ] Restart, rerun, recreate.
+
+:::
+
+::::
+
+
+## One immutable workflow: preserve and check
+
+```r
+raw_path <- 
+  here::here(
+    "Data", "Input", "forest_plots.csv"
+)
+
+forest_raw <- 
+  readr::read_csv(raw_path)
+
+forest_checked <- 
+  forest_raw |>
+  dplyr::mutate(
+    canopy_valid = dplyr::between(
+      canopy_cover_pct, 0, 100
+    ),
+    complete = !is.na(species_richness) & canopy_valid
+  )
+```
+
+::: {.fragment .blockquote}
+The received file and `forest_raw` are still available for comparison. 
+:::
+
+
+## One immutable workflow: summarise and save
+
+```r
+forest_summary <- 
+  forest_checked |>
+  dplyr::filter(complete) |>
+  dplyr::summarise(
+    plots = dplyr::n(),
+    mean_richness = mean(species_richness),
+    .by = forest_type
+  )
+
+readr::write_csv(
+  forest_summary,
+  here::here("Data", "Derived", "forest_summary.csv")
+)
+```
+
+::: {.fragment .blockquote}
+The derived file is replaceable because the script can recreate it.
+:::
+
+
+# [MAKE THE PROJECT PORTABLE]{.bold .r-fit-text} {.title}
+
+## Bad paths are dangerous🔥
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="59%" .fragment}
 
 [@JennyBryan](https://twitter.com/JennyBryan):
 
 ::: {.blockquote}
 If the first line of your R script is
 
-```{r}
-#| label: jenny-quote
-#| eval: false
-#| echo: true
-#| code-line-numbers: false
+```r
 setwd("C:/Users/jenny/path/that/only/I/have")
 ```
 
 I will come into your office and **SET YOUR COMPUTER ON FIRE** 🔥.
 :::
+
 :::
 
-::: {.column width="45%" .fragment}
-```{r}
-#| label: here-here
-include_local_figure("Packages/here_pkg.png")
-```
+::: {.column width="40%" .fragment .text-center}
 
-The [{here} package](https://here.r-lib.org/) is up for rescue! 
+![](Materials/Packages/here_pkg.png){fig-alt="Artwork for the here R package showing a small creature navigating project paths" width="82%"}
+
+The [`{here}` package](https://here.r-lib.org/) is up for rescue!
+
 :::
+
 ::::
 
 ::: {.footer}
-Artwork by [@allison_horst](https://twitter.com/allison_horst)
+`{here}` artwork by [Allison Horst](https://allisonhorst.com/)
 :::
 
-## The Path Problem
+::: {.notes}
+[Sources]
+
+- Jenny Bryan, working-directory quotation retained from the earlier course decks: https://twitter.com/JennyBryan
+- Allison Horst, `{here}` artwork: https://allisonhorst.com/
+- `{here}` package documentation: https://here.r-lib.org/
+:::
+
+## Absolute vs relative
+
+<br>
+
+```{.r code-line-numbers="1"}
+input_path <- "C:/Users/FrantaVomacka/Desktop/forest_plots.csv"
+```
+
+What assumptions are hidden here?
+
+<br>
+
+::: {.fragment .incremental}
+
+- the drive;
+- the user name;
+- the Desktop folder;
+- the location of the data.
+
+:::
+
+## Repair the path with `{here}`
 
 <br>
 
 :::: {.columns}
 
 ::: {.column width="50%" .fragment}
+```r
+input_path <- 
+  "C:/Users/FrantaVomacka/Desktop/forest_plots.csv",  
+```
+:::
 
-### ❌ **What Goes Wrong**
+::: {.column width="50%" .fragment}
+```{.r code-line-numbers="1-4"}
+input_path <- 
+  here::here(
+    "Data/Input",
+    "forest_plots.csv"
+  )
+```
+:::
+
+::::
+
+<br>
+
+::: {.fragment .blockquote}
+`here::here()` starts at the project root (relative path).
+:::
+
+::: {.fragment}
+```r
+here::here()
+[1] "D:/GITHUB/SSoQE/SSoQE-Our_Way_of_R_and_Reproducibility"
+```
+:::
+
+## [Path repair challenge]{.text-size-heading2} {.exercise .text-center}
+
+Rewrite this line so it works after the project folder is moved:
+
+<br>
 
 ```r
-# This breaks on other computers:
-setwd("C:/Users/John/Documents/Project")
-data <- read.csv("../data/file.csv")
-
-# Different on Mac/Linux:
-setwd("/Users/john/Documents/Project")
-
-# Fragile and non-reproducible
-source("C:/path/to/my/script.R")
+readr::read_csv("C:/course/data/forest_plots.csv")
 ```
-:::
 
-::: {.column width="50%" .fragment .incremental}
+<br>
 
-### 😱 **Common Issues**
-
-- Code breaks on different computers
-- Collaborators can't run your code
-- Different operating systems
-- Moving project folders
-:::
-
-::::
-
-## [Exercise]{.r-fit-text} {.exercise .text-center}
-
-::: {.blockquote}
-1. install the [{here} package](https://here.r-lib.org/)
-2. try running `here::here()` in your R console
-3. What is the difference between relative and absolute paths?
-:::
-
-`r countdown(minutes = 3)`
-
-## Exercise - rewrite the code using `{here}`
-
-:::: {.columns}
-
-::: {.column width="60%"}
-
-```{r}
-#| label: here-exercise
-#| eval: false
-#| echo: true
-#| code-line-numbers: false
-# original code
-data <- 
-  read.csv(
-    "C:/Users/jenny/path/that/only/I/have/Data/file.csv"
-  )
-
-source(
-  "C:/Users/jenny/path/that/only/I/have/R/functions.R"
+::: {.fragment}
+```r
+readr::read_csv(
+  here::here("Data", "Input", "forest_plots.csv")
 )
 ```
-
 :::
 
-::: {.column width="40%" .fragment}
-
-```{r}
-#| label: here-exercise-solution
-#| eval: false
-#| echo: true
-#| code-line-numbers: false
-# solution
-library(here)
-
-data <- 
-  read.csv(
-    here::here(
-      "Data/file.csv"
-    )
-  )
-
-source(
-  here::here(
-    "R/functions.R"
-  )
-)
-```
-
-:::
-
-::::
-
-# [Setup & Check]{.bold .r-fit-text} {.title}
-
-## Required Software Checklist {.text-center}
+## Code also depends on its environment 📦
 
 <br>
 
-- [ ] **R** (version 4.5+ recommended)
-- [ ] **RStudio** (latest version)
-- [ ] **Rtools** (Windows only)
-- [ ] **Git** (for version control)
+Will it run on [your machine]{.text-highlight-persianGreen}?—and [in 10 years]{.text-highlight-satinSheenGold}?
 
-## Install/update R
+<br>
 
 :::: {.columns}
 
-::: {.column width="70%"}
-Make sure you have the latest version of R installed. You can check the version by running:
+::: {.column width="54%" .fragment}
 
-```{r}
-#| label: r-version
-#| echo: true
-#| eval: true
-R.version.string
+```r
+source("R/analysis.R")
+# Error in library(dplyr):
+#   there is no package called 'dplyr'
 ```
 
-Install the newest version of R from [CRAN](https://cran.r-project.org/).
+::: {.fragment .blockquote}
+R packages are part of Environment. The script can move with the project, but the environemnt did not.
 :::
-
-::: {.column width="30%"}
-
-```{r}
-#| label: r-logo
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Logos/R_logo.svg.png")
-```
-:::
-::::
-
-### Bonus
-
-Check out [{updateR}](https://www.danieldsjoberg.com/updater/) package to update R and all installed packages.
-
-
-## Install/update RStudio
-
-Make sure you have the latest version of RStudio installed. You can check the version by running:
-
-```{r}
-#| label: rstudio-version
-#| echo: true
-#| eval: false
-rstudioapi::versionInfo()$version
-# ‘2025.5.1.513’
-```
-
-You can download the newest version of RStudio from [RStudio website](https://rstudio.com/products/rstudio/download/).
-
-```{r}
-#| label: rstudio-logo-2
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Logos/RStudio_logo_flat.svg.png")
-```
-
-## Rtools (Windows only)
-
-[Rtools]{.text-bold} is a collection of tools necessary for [building R packages]{.text-highlight-midnightGreen} on [Windows]{.text-highlight-satinSheenGold}.
-
-You can download Rtools from [CRAN Rtools page](https://cran.r-project.org/bin/windows/Rtools/).
-
-::: {.blockquote}
-You need version compatible with your R version. For R 4.5+, use Rtools 4.5 or later.
-:::
-
-## {usethis} package
-
-:::: {.columns}
-
-::: {.column width="65%"}
-The [{usethis} package](https://usethis.r-lib.org/index.html) is a collection of functions that help automate package and project setup tasks.
-
-Install the package by running:
-```{r}
-#| label: usethis-install
-#| echo: true
-#| eval: false
-install.packages("usethis")
-```
 
 :::
 
-::: {.column width="30%"}
-```{r}
-#| label: usethis-logo
-#| fig-width: 1
-#| fig-height: 1
-knitr::include_graphics("https://usethis.r-lib.org/logo.png")
-```
+::: {.column width="45%" .text-center .fragment}
+
+![](Materials/Packages/renv.png){fig-alt="Artwork for the renv R package showing a robot maintaining a project package library" width="82%"}
+
+{renv} for the rescue!
+
 :::
 
 ::::
 
-# [R packages]{.bold .r-fit-text} {.title}
+::: {.footer}
+`{renv}` artwork by [Allison Horst](https://allisonhorst.com/)
+:::
 
-## Install all required packages
+::: {.notes}
+[Sources]
+
+- Allison Horst, `{renv}` artwork: https://allisonhorst.com/
+- `{renv}` package documentation: https://rstudio.github.io/renv/
+:::
+
+## Without `{renv}`: shared library 🚰
 
 <br>
 
-::: {.blockquote}
-Go to [SSoQE - pre-workshop setup](https://ssoqe.github.io/SSoQE_website/About/pre_workshop.html#packages) and run the provided code chunk in your R console to install all required packages.
+```{mermaid}
+flowchart TB
+  L["💻 User library<br/><b>dplyr 1.1.4</b>"]
+  subgraph P[" "]
+    direction LR
+    F["🌲 Forest project"]
+    T["📜 Old thesis"]
+    N["🔬 New analysis"]
+  end
+  L --> F
+  L --> T
+  L --> N
+  classDef library fill:#A1C3B3,stroke:#155560,color:#1F2937
+  classDef project fill:#F2F4F2,stroke:#509A8E,color:#1F2937
+  class L library
+  class F,T,N project
+  style P fill:#F2F4F2,stroke:#509A8E,color:#155560
+  linkStyle default stroke:#509A8E,stroke-width:2px
+```
+
+::: {.fragment .blockquote}
+Update `dplyr` once—and all three projects see the change. 😬
 :::
 
-# [Version Control]{.bold .r-fit-text} {.title}
-
-## 
-
-:::: columns
-
-::: {.column width="45%"}
-
-### Git {.text-center}
-
-* local software
-* keep track of changes of files 
+## With `{renv}`: project libraries 🧰
 
 <br>
 
-```{r}
-#| label: git-logo
-#| fig-width: 1
-#| fig-height: 1 
-include_local_figure("Logos/Git_icon.svg.png")
+```{mermaid}
+flowchart TB
+  subgraph P[" "]
+    direction LR
+    F["🌲 Forest project<br/><b>project library: dplyr 1.1.4</b><br/>📋 lockfile: 1.1.4"]
+    T["📜 Old thesis<br/><b>project library: dplyr 1.0.10</b><br/>📋 lockfile: 1.0.10"]
+    N["🔬 New analysis<br/><b>project library: dplyr 1.1.4</b><br/>📋 lockfile: 1.1.4"]
+    F ~~~ T
+    T ~~~ N
+  end
+  classDef project fill:#F2F4F2,stroke:#509A8E,color:#1F2937
+  class F,T,N project
+  style P fill:#F2F4F2,stroke:#509A8E,color:#155560
 ```
 
+::: {.fragment .blockquote}
+Each project selects its own version. Its `renv.lock` records the choice. ✅
 :::
 
-::: {.column width="10%" }
-:::
-
-::: {.column width="45%" }
-
-### GitHub {.text-center}
-
-* host server
-* store the (git) data
-* project management, collaboration, publishing
-
-```{r}
-#| label: github-logo
-#| fig-width: 1
-#| fig-height: 1
-include_local_figure("Logos/GH_Desktop_logo.webp")
-```
-
-:::
-::::
-
-## Half the battle "git hell"
-
-::: {.blockquote}
-Getting all the necessary software installed, configured, and playing nicely together is honestly half the battle ... **Brace yourself for some pain**
-:::
-
-
-```{r}
-#| label: ErrorManagement
-include_local_figure("Scriberia/ErrorManagement.jpg")
-```
-
-::: footer
-[Happy Git and GitHub for the useR](https://happygitwithr.com/install-intro) |
-[This image was created by Scriberia for The Turing Way community and is used under a CC-BY licence](https://zenodo.org/doi/10.5281/zenodo.3332807)
-:::
-
-## [GitHub]{.r-fit-text} {.subtitle .text-center}
-
-## Making the account
-
-You will need a [GitHub account]{.text-color-highlight-primary}.
-
-It is super easy to create one, just go to [GitHub.com](https://github.com/) and follow the instructions.
+## The lockfile is the recipe 📋
 
 <br>
 
-::: {.fragment .incremental}
-### Some tips
+[How do your package versions reach somebody else?]{.text-highlight-persianGreen}
 
-* Use a professional username, preferably your name
-* Use university/science institute email address
-  * You can gain access to [GitHub Education](https://education.github.com/), e.g. free private repositories!
+<br>
+
+::: {.fragment}
+### 1. Record the recipe 📸
+
+[📦 Your project library]{.text-highlight-persianGreen} → `renv::snapshot()` → [📋 renv.lock]{.text-highlight-satinSheenGold}
 :::
 
-## [Git]{.r-fit-text} {.subtitle .text-center}
+<br>
 
-## 🐚 shell intermezzo
+::: {.fragment}
+### 2. Rebuild elsewhere ♻️
 
-- You will need to use the shell (command line) to interact with Git.
-- The actual tool might differ based on your operating system.
-- Please refer to [this document](https://happygitwithr.com/shell) for more information.
-
-::: {.blockquote .fragment}
-If you are using RStudio, you can use the built-in [terminal]{.text-highlight-persianGreen} (NOT Console).
+[📋renv.lock]{.text-highlight-satinSheenGold} → `renv::restore()` → [💻 Their project library]{.text-highlight-persianGreen}
 :::
 
-## Installation
+::: {.incremental}
 
-Is [Git]{.text-color-highlight-midnightGreen} already installed?
+- `renv::init()` creates this setup once for a new project.
+- `renv::status()` asks whether the project library and lockfile agree.
 
-Check your [version]{.text-color-highlight-persianGreen}:
-
-```{bash}
-#| label: git-version
-#| echo: true
-#| eval: false
-git --version
-## git version 2.42.0.windows.2
-```
-
-## Installation
-
-::::: {.panel-tabset}
-
-### Windows
-
-Download and install [Git for Windows](https://gitforwindows.org/)
-
-### MacOS
-
-Download and install [Git for MacOS](https://git-scm.com/download/mac)
-
-### Linux
-
-Ubuntu or Debian Linux:
-```{bash}
-#| label: git-install-linux-ubuntu
-#| echo: true
-#| eval: false
-sudo apt-get install git
-```
-
-Fedora or RedHat Linux:
-
-```{bash}
-#| label: git-install-linux-fedora
-#| echo: true
-#| eval: false
-sudo yum install git
-```
-
-:::::
-
-## Configuration
-
-Introduce yourself to Git 👋
-
-❗Note to substitute your name and the email address❗
-
-Use the [same email address]{.text-color-highlight-primary} as the one you used for [GitHub account]{.text-color-highlight-secondary}.
-
-```{bash}
-#| label: git-config
-#| echo: true
-#| eval: false
-git config --global user.name "Jane Doe"
-git config --global user.email "jane@example.com"
-git config --global --list
-```
+:::
 
 
-## Can you hear me now?
+::: {.notes}
+[Sources]
 
-We now need to make sure that RStudio can communicate with Git.
+- `{renv}` package documentation: https://rstudio.github.io/renv/
+:::
 
-### Step 1 - Git
+## Workflow final boss 🐉 {.exercise .text-center}
 
-Confirm that git has your name and email by running:
+<br>
 
-```{r}
-#| label: git-check
-#| echo: true
-#| eval: false
-usethis::use_git()
-```
+::: {.blockquote .smaller}
 
-If needed, set the name and email by running:
+**With a partner.**
 
-```{r}
-#| label: git-config-usethis
-#| echo: true
-#| eval: false
-# replace with your name and email
-usethis::use_git_config(user.name = "Jane Doe", user.email = "jane@example.com")
-```
+1. 🏠 **Build:** create a new R Project. Run `renv::init()`, then install `{dplyr}`, `{here}`, and `{readr}`.
+2. 🛠️ **Repair:** copy the [broken tree analysis](https://raw.githubusercontent.com/SSoQE/SSoQE-Our_Way_of_R_and_Reproducibility/main/R/Exercises/final_boss_starter.R) into `R/analysis.R`. Keep the input, objects, and original columns unchanged. Use `here::here()` for every path.
+3. 🔄 **Prove:** save prepared data and a summary in `Data/Derived`. Snapshot, restart R, delete those outputs, then let your partner recreate them.
 
-## Can you hear me now?
+:::
 
-We now need to make sure that RStudio can communicate with Git.
+::: {.fragment}
 
-###  Step 2 - PAT (Personal Access Token)
-
-You can check more details about it [here](https://usethis.r-lib.org/articles/git-credentials.html) and [here](https://happygitwithr.com/https-pat#https-pat).
-
-```{r}
-#| label: pat
-#| echo: true
-#| eval: false
-usethis::create_github_token()
-```
-
-Click [Generate token]{.text-color-highlight-primary} and [copy the token]{.text-color-highlight-secondary} to a safe place.
-
-## Can you hear me now?
-
-Add the [PAT]{.text-color-highlight-primary} to RStudio by running:
-
-### Step 3 - RStudio3
-
-```{r}
-#| label: pat-add
-#| echo: true
-#| eval: false
-gitcreds::gitcreds_set()
-```
-
-## Can you hear me now?
-
-Other useful functions:
-
-```{r}
-#| label: pat-list
-#| echo: true
-#| eval: false
-# Read about PAT
-usethis::gh_token_help()
-
-# List all git settings
-usethis::git_sitrep()
-
-# Check if PAT is set
-gh::gh_whoami()
-```
-
-If everything fails, you can try to set up the PAT manually into your `.Renviron` file.
-
-Simply run:
-```{r}
-#| label: pat-manual
-#| echo: true
-#| eval: false
-usethis::edit_r_environ()
-```
-
-Add a line like this, but substitute your PAT:
-```{bash}
-#| label: pat-manual-2
-#| echo: true
-#| eval: false
-GITHUB_PAT=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
+[You win when the input file is unchanged, both outputs return, and `renv::status()` is clean. 🏆]{.text-highlight-persianGreen}
+:::
 
 # [Outro]{.bold .r-fit-text} {.title}
 
-## SPROuT
+## Audit questions
 
-The materials used in this presentation are further expanded in a greater detail in course [Science Powered through Reproducibility, Openness, and Teamwork (SPRouT)](https://github.com/CUNI-SPRouT) taught at Charles University.
+::: {.incremental}
 
-```{r}
-#| label: sprot-logo
-include_local_figure("Logos/sprout_logo.png")
-```
+- Did the script run from a fresh session?
+- Were all objects recreated from code?
+- Did every path begin at the project root?
+- Was the input file unchanged?
+- Was the derived output recreated?
+- Is the `{renv}` project still synchronized?
 
-## About me
-
-:::: {.columns}
-
-::: {.column width="25%"}
-```{r}
-#| label: personal sticker
-include_local_figure("Author/Ondrej_Mottl-transparent-shadow.png")
-```
-
-```{r}
-#| label: linktree QR
-qr_personal_web <-
-  qrcode::qr_code(
-    "https://bit.ly/ondrej_mottl",
-    ecl = "H"
-  )
-
-qrcode::generate_svg(
-  qrcode = qr_personal_web,
-  filename = here::here("Presentation/Materials/QR/qr_personal_web.svg"),
-  foreground = ssoqe_cols['black'],
-  background = ssoqe_cols['white']
-)
-
-include_local_figure("QR/qr_personal_web.svg")
-```
 :::
 
-::: {.column width="5%"}
+One “no” is useful evidence about the next repair.
+
+## The six habits 🌱
+
+::: {.incremental}
+
+1. [Start fresh.]{.text-highlight-persianGreen}
+2. [Put consequential code in scripts.]{.text-highlight-cambridgeBlue}
+3. [Give each file a compartment.]{.text-highlight-satinSheenGold}
+4. [Build paths from the project root.]{.text-highlight-persianGreen}
+5. [Record project dependencies.]{.text-highlight-cambridgeBlue}
+6. [Preserve inputs and provenance.]{.text-highlight-satinSheenGold}
+
 :::
 
-::: {.column width="70%"}
-[Ondřej Mottl]{.bold .r-fit-text .text-color-black}
-Assistant Professor at [Charles University](https://cuni.cz/UK-1.html)
+# Thank you! 🎉 {.title}
 
-Head of the 🧑‍💻 [Laboratory of Quantitative Ecology](https://ondrejmottl.github.io/lab/about_the_lab.html)
-
-* 📧 Ondrej.mottl(at)gmail.com
-* 🦋 [ondrejmottl.bsky.social](https://bsky.app/profile/ondrejmottl.bsky.social)
-* 🐱 [Github](https://github.com/OndrejMottl)
-* 🆔 [ORCID](https://orcid.org/0000-0002-9796-5081)
-* 🌐 [Personal webpage](https://ondrejmottl.github.io/)
-:::
-
-::::
+![](Materials/Logos/SSOQE_logo3.png){fig-alt="Science School on Quantitative Ecology logo" width="18%"}
