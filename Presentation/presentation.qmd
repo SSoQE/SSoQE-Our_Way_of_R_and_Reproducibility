@@ -209,41 +209,6 @@ I reproduced the result on [my computer]{.text-highlight-cambridgeBlue}. Is the 
 
 ::::
 
-## Our mini-project 🌲
-
-<br>
-
-Twelve synthetic forest plots contain:
-
-- forest type;
-- tree count 
-- mean diameter;
-- species richness;
-- canopy cover
-
-<br>
-
-::: {.fragment}
-Our goal is a small summary that another researcher can reproduce.
-:::
-
-
-## How we will repair it 🧰
-
-<br>
-
-::: {.incremental}
-
-- Define the reproducibility problem;
-- Remove hidden state;
-- Protect the evidence;
-- Give the analysis a home;
-- Make files and software portable;
-- Assemble and run the complete workflow;
-- Let somebody else prove it.
-
-:::
-
 # [REMOVE HIDDEN STATE]{.bold .r-fit-text} {.title}
 
 ## A suspicious success 🤨
@@ -462,29 +427,22 @@ A clean session should fail loudly when the script forgot a step. 📣
 
 ::::
 
-## Scripts: the project's memory 🧠
+## [Are you using `.RData`?]{.text-size-heading2} {.exercise .text-center}
 
 <br>
 
-::: {.fragment}
-Put every decision needed for the result in a script:
+::: {.blockquote}
 
-```r
-# R/analysis.R  
-forest_raw <- 
-  readr::read_csv(
-    here::here("Data", "Input", "forest_plots.csv"),
-    show_col_types = FALSE
-  )
+**Discuss with a partner for 2–3 minutes:**
 
-estimate_diversity(forest_raw)
-```
+1. Does RStudio save or restore `.RData` on your computer?
+2. Which objects might return even though no script recreated them?
+3. What might break if you turn `.RData` off and restart R?
+
 :::
 
-<br>
-
 ::: {.fragment .blockquote}
-If a command matters, it belongs in the script.
+Hidden state can make an incomplete script look reproducible.
 :::
 
 ## [Note on practical exercises]{.r-fit-text .text-color-dartmouth-green} {.bg-white}
@@ -504,17 +462,17 @@ If a command matters, it belongs in the script.
 With a partner:
 
 1. Create a new object in the Console;
-2. Chech the Environment panel;
-3. restart R session (CTRL + Shift + F10);
+2. Check the Environment panel;
+3. Restart the R session (`Ctrl + Shift + F10`);
 4. Check the Environment panel again.
-5. (Optional) Dissable automatic saving of .RData.
+5. (Optional) Disable automatic saving of `.RData`.
 
 :::
 
 
 # [GIVE THE ANALYSIS A HOME]{.bold .r-fit-text} {.title}
 
-## Project based workflow 
+## Project-based workflow
 
 ```{r}
 #| label: project_compendium
@@ -526,6 +484,31 @@ include_local_figure("Scriberia/ResearchCompendium.jpg")
 :::
 :::{.footer}
 
+:::
+
+## Scripts: the project's memory 🧠
+
+<br>
+
+::: {.fragment}
+Put every decision needed for the result in a script:
+
+```r
+# R/analysis.R
+forest_raw <-
+  readr::read_csv(
+    here::here("Data", "Input", "forest_plots.csv"),
+    show_col_types = FALSE
+  )
+
+estimate_diversity(forest_raw)
+```
+:::
+
+<br>
+
+::: {.fragment .blockquote}
+If a command matters, it belongs in the script.
 :::
 
 ## RStudio Projects
@@ -572,7 +555,7 @@ include_local_figure("Scriberia/ResearchCompendium.jpg")
 1. Select **File → New Project → New Directory → New Project**.
 2. Name it `forest-sandbox` and create it somewhere you can find again.
 3. Use RStudio's top-right project menu to return to this lesson.
-4. Switch back to `forest-sandbox` with the same menu.
+4. Switch once more to `forest-sandbox`, then return to this lesson before continuing.
 :::
 
 # [PROTECT THE EVIDENCE]{.bold .r-fit-text} {.title}
@@ -791,52 +774,50 @@ forest_checked <-
 ::::
 
 
-## One immutable workflow: preserve and check
+## [Immutable or overwritten?]{.text-size-heading2} {.exercise .text-center}
 
 ```r
-raw_path <- 
-  here::here(
-    "Data", "Input", "forest_plots.csv"
-)
+forest_raw <-
+  readr::read_csv(input_path)
 
 forest_raw <- 
-  readr::read_csv(raw_path)
-
-forest_checked <- 
   forest_raw |>
   dplyr::mutate(
-    canopy_valid = dplyr::between(
-      canopy_cover_pct, 0, 100
-    ),
-    complete = !is.na(species_richness) & canopy_valid
-  )
+    canopy_cover = canopy_cover * 100
+  ) |>
+  dplyr::filter(!is.na(species_richness))
+
+readr::write_csv(forest_raw, input_path)
 ```
 
-::: {.fragment .blockquote}
-The received file and `forest_raw` are still available for comparison. 
+::: {.blockquote}
+**In groups (4 minutes):** Find where this workflow destroys the original evidence at the file, object, and column levels. How would you repair it?
 :::
 
 
-## One immutable workflow: summarise and save
+## One immutable repair
 
 ```r
-forest_summary <- 
-  forest_checked |>
-  dplyr::filter(complete) |>
-  dplyr::summarise(
-    plots = dplyr::n(),
-    mean_richness = mean(species_richness),
-    .by = forest_type
-  )
+forest_raw <-
+  readr::read_csv(input_path)
+
+forest_clean <-
+  forest_raw |>
+  dplyr::mutate(
+    canopy_cover_percent = canopy_cover * 100
+  ) |>
+  dplyr::filter(!is.na(species_richness))
 
 readr::write_csv(
-  forest_summary,
-  here::here("Data", "Derived", "forest_summary.csv")
+  forest_clean,
+  here::here(
+    "Data", "Derived", "forest_plots_checked.csv"
+  )
 )
 ```
 
 ::: {.fragment .blockquote}
-The derived file is replaceable because the script can recreate it.
+The received file, imported object, and reported column remain available for comparison. The derived file can be recreated.
 :::
 
 
@@ -907,16 +888,36 @@ What assumptions are hidden here?
 
 :::
 
+## [Path repair challenge]{.r-fit-text} {.exercise .text-center}
+
+**In groups (5 minutes):**
+
+1. Discuss: Is the path below absolute or relative? What makes it fragile?
+
+<br>
+
+```r
+readr::read_csv("C:/course/data/forest_plots.csv")
+```
+
+::: {.fragment}
+2. Run `here::here()` on each computer. What differs? Which project root did `{here}` find?
+:::
+
+::: {.fragment}
+3. Now rewrite the import so it still works after the project moves.
+:::
+
 ## Repair the path with `{here}`
 
 <br>
 
 :::: {.columns}
 
-::: {.column width="50%" .fragment}
+::: {.column width="50%"}
 ```r
 input_path <- 
-  "C:/Users/FrantaVomacka/Desktop/forest_plots.csv",  
+  "C:/course/data/forest_plots.csv"
 ```
 :::
 
@@ -924,7 +925,7 @@ input_path <-
 ```{.r code-line-numbers="1-4"}
 input_path <- 
   here::here(
-    "Data/Input",
+    "Data", "Input",
     "forest_plots.csv"
   )
 ```
@@ -934,35 +935,16 @@ input_path <-
 
 <br>
 
-::: {.fragment .blockquote}
-`here::here()` starts at the project root (relative path).
-:::
-
-::: {.fragment}
-```r
-here::here()
-[1] "D:/GITHUB/SSoQE/SSoQE-Our_Way_of_R_and_Reproducibility"
-```
-:::
-
-## [Path repair challenge]{.text-size-heading2} {.exercise .text-center}
-
-Rewrite this line so it works after the project folder is moved:
-
-<br>
-
-```r
-readr::read_csv("C:/course/data/forest_plots.csv")
-```
-
-<br>
-
 ::: {.fragment}
 ```r
 readr::read_csv(
-  here::here("Data", "Input", "forest_plots.csv")
+  input_path
 )
 ```
+:::
+
+::: {.fragment .blockquote}
+`here::here()` returns a full path, built from the project root and the relative pieces you provide.
 :::
 
 ## Code also depends on its environment 📦
